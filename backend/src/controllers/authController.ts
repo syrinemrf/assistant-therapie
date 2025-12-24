@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { User } from "../models/User";
-import { Session } from "../models/Session";
+import { AuthSession } from "../models/AuthSession";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -57,7 +57,7 @@ export const login = async (req: Request, res: Response) => {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
-    const session = new Session({
+    const session = new AuthSession({
       userId: user._id,
       token,
       expiresAt,
@@ -79,7 +79,7 @@ export const logout = async (req: Request, res: Response) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
-      await Session.deleteOne({ token });
+      await AuthSession.deleteOne({ token });
     }
     res.json({ message: "Logged out successfully" });
   } catch (error) {

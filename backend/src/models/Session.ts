@@ -1,24 +1,29 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ISession extends Document {
   userId: mongoose.Types.ObjectId;
-  token: string;
-  expiresAt: Date;
-  deviceInfo?: string;
-  lastActive: Date;
+  title: string;
+  startedAt: Date;
+  endedAt?: Date;
+  status: 'active' | 'completed' | 'paused';
+  summary?: string;
+  initialMood?: string;
+  finalMood?: string;
 }
 
-const SessionSchema = new Schema<ISession>(
-  {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    token: { type: String, required: true, unique: true },
-    expiresAt: { type: Date, required: true },
-    deviceInfo: { type: String },
-    lastActive: { type: Date, default: Date.now },
+const SessionSchema = new Schema<ISession>({
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  title: { type: String, default: 'Nouvelle session' },
+  startedAt: { type: Date, default: Date.now },
+  endedAt: Date,
+  status: { 
+    type: String, 
+    enum: ['active', 'completed', 'paused'], 
+    default: 'active' 
   },
-  { timestamps: true }
-);
+  summary: String,
+  initialMood: String,
+  finalMood: String
+}, { timestamps: true });
 
-SessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-
-export const Session = mongoose.model<ISession>("Session", SessionSchema);
+export default mongoose.model<ISession>('Session', SessionSchema);
